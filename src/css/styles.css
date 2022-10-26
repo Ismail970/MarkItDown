@@ -1,0 +1,217 @@
+:root {
+  --save-btn: #ff9980;
+}
+
+/* resets */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  list-style: none;
+}
+
+html:focus-within {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  text-rendering: optimizeSpeed;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+body {
+  font-family: 'Rubik', sans-serif;
+  overflow-x: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  background-color: #dddddd;
+  overflow-x: scroll;
+}
+
+.header div {
+  display: flex;
+}
+
+header nav::after {
+  content: "";
+  width: 25%;
+  height: 51px;
+  right: 0;
+  top: 0;
+  background-image: linear-gradient(to right, transparent, rgb(75, 75, 75));
+  position: absolute;
+}
+
+.save-btn {
+  background-color: var(--save-btn);
+  padding: .5em;
+  border-radius: 4px;
+  position: absolute;
+  right: 5px;
+}
+
+.add-btn {
+  position: absolute;
+  right: 50px;
+  z-index: 1;
+  background-color: white;
+  border-radius: 5px;
+  padding: .1em;
+}
+
+.header>div:first-child nav,
+.header>div:last-child {
+  padding: .5em;
+}
+
+.header>div:last-child {
+  gap: 1em;
+  padding-right: 1em;
+}
+
+.header>div:first-child {
+  gap: .5em;
+}
+
+.menu-btn {
+  padding: 1em;
+  position: -webkit-sticky;
+  position: sticky;
+  left: 0;
+  background-image: linear-gradient(to right, #dddddd 90%, transparent);
+}
+
+header nav {
+  display: flex;
+  align-items: center;
+}
+
+.header__opened-files {
+  display: flex;
+  gap: .5em;
+}
+
+.add-btn {
+  /* opacity: .3; */
+  margin-left: .5em;
+}
+
+.document {
+  gap: .5em;
+  align-items: center;
+  cursor: pointer;
+}
+
+.document-container {
+  display: flex;
+  gap: .8em;
+  padding-left: 1em;
+}
+
+.document-container:first-child {
+  padding-left: 0;
+}
+
+.remove-btn {
+  opacity: .8;
+  font-size: .7rem;
+}
+
+.markdown header,
+.preview header {
+  background-color: #f1f1f1;
+  padding: .5em 1em;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+}
+
+#text {
+  width: 100%;
+  max-height: 100%;
+  resize: none;
+  border: 0;
+  outline: none;
+  padding: 1em 2em;
+  overflow: hidden;
+}
+
+#preview {
+  padding: 1em 2em;
+  word-break: break-all;
+}
+
+#preview img {
+  width: 100%;
+}
+
+.menu-btn {
+  transition: rotate 350ms;
+}
+
+.menu-btn:hover {
+  rotate: 90deg;
+}
+
+.menu {
+  height: 100vh;
+  position: absolute;
+  background-color: white;
+  transition: left 350ms;
+  left: -100vw;
+  min-width: 200px;
+}
+
+.menu>p {
+  padding: 1em;
+}
+
+.menu .document {
+  display: flex;
+}
+
+.menu .document-container {
+  padding: 1em 2em;
+  padding-left: 1em;
+}
+
+.menu .header__opened-files {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.show {
+  left: 0;
+}
+
+.hide {
+  display: none;
+}
+
+.active {
+  background-color: white;
+  border-radius: 10px;
+  padding: 0 .5em;
+}
