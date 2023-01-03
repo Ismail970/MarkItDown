@@ -1,5 +1,4 @@
 import * as markdownit from "markdown-it";
-import autoresize from "autosize";
 import saveAs from 'file-saver';
 
 const themeBtn = document.querySelector(".theme-btn");
@@ -130,12 +129,41 @@ const updateDataTitle = e => {
   setLocalStorage("data", data);
 };
 
-document.addEventListener("keyup", function (e) {
+const changePrev = () => {
+  if (data.flat().find(item => item.id === +getCurId()).previewMode) {
+    previewSec.classList.remove("hide");
+  } else {
+    previewSec.classList.add("hide");
+  }
+  textSec.style.gridColumn = previewSec.classList.contains("hide") ? "1/-1" : "auto";
+  previewBtn.innerHTML = `<i class="fa-regular fa-${previewSec.classList.contains("hide") ? "eye" : "eye-slash"}"></i>`;
+  text.scrollTop = data.flat().find(item => item.id === +getCurId()).position.scroll;
+  // text.focus();
+  // text.setSelectionRange(...data.flat().find(item => item.id === +getCurId()).position.cursor);
+
+  const secHeight = window.innerHeight - (header.clientHeight + textSec.firstElementChild.clientHeight);
+  preview.style.overflowY = preview.scrollHeight > secHeight ? "scroll" : "hidden";
+  preview.style.height = preview.scrollHeight > secHeight ? `${secHeight}px` : `${preview.scrollHeight}px`;
+
+  const fullScroll = text.scrollTop + text.clientHeight;
+  if (fullScroll === text.scrollHeight) {
+    preview.scrollTop = text.scrollHeight;
+  } else {
+    preview.scrollTop = text.scrollTop;
+  }
+};
+
+header.addEventListener("keyup", e => {
   if (e.target.id !== "file-name") return;
   updateDataTitle(e);
 });
 
-document.addEventListener("keydown", function (e) {
+header.addEventListener("paste", e => {
+  if (e.target.id !== "file-name") return;
+  e.preventDefault();
+});
+
+header.addEventListener("keydown", e => {
   if (e.target.id !== "file-name" || e.key !== "Enter") return;
   const fileName = e.target;
   e.preventDefault();
@@ -144,7 +172,7 @@ document.addEventListener("keydown", function (e) {
   formatFileName();
 });
 
-document.addEventListener("focusout", e => {
+header.addEventListener("focusout", e => {
   if (e.target.id !== "file-name") return;
   setDefaultName(e);
   updateDataTitle(e);
@@ -166,6 +194,8 @@ header.addEventListener("click", function (e) {
   if (curFile.dataset.id !== getCurId()) return;
   changeText(curFile.dataset.id);
   curFile.classList.add("active");
+  checkHeight();
+  changePrev();
 
   curFile.scrollIntoView({
     behavior: 'smooth'
@@ -190,6 +220,7 @@ header.addEventListener("click", function (e) {
   removeScroll();
 
   if (filesParent.childElementCount === 1) {
+    // potentional scroll saving issue
     textSec.classList.add("hide");
     previewSec.classList.add("hide");
     text.value = preview.innerHTML = "";
@@ -200,6 +231,8 @@ header.addEventListener("click", function (e) {
   changeLink(lastFileEl.dataset.id);
   lastFileEl.classList.add("active");
   changeText(lastFileEl.dataset.id);
+  checkHeight();
+  changePrev();
 });
 
 const observer = new ResizeObserver(entries => {
@@ -266,8 +299,10 @@ menu.addEventListener("click", function (e) {
   changeText(curFile.dataset.id);
   textSec.classList.remove("hide");
 
+  checkHeight();
+  changePrev();
 
-  data.flat().find(item => headerFiles.find(headerFile => item.id === +headerFile.dataset.id)).opened = true;
+  data.flat().find(item => item.id === +curFile.dataset.id).opened = true;
   setLocalStorage("data", data);
 });
 
@@ -279,6 +314,11 @@ addBtn.addEventListener("click", function () {
     title: "Untitled",
     saved: false,
     opened: true,
+    previewMode: false,
+    position: {
+      scroll: 0,
+      cursor: [],
+    },
   };
 
   data.push(info);
@@ -292,12 +332,23 @@ addBtn.addEventListener("click", function () {
   changeLink(id);
   setScroll();
   lastFilesEl.previousElementSibling.querySelector("#file-name").focus();
+  checkHeight();
+
+  changePrev();
 });
 
-previewBtn.addEventListener("click", () => {
-  previewSec.classList.toggle("hide");
+document.querySelector("main").addEventListener("click", function (e) {
+  if (e.target.parentElement.classList.contains("preview-btn")) previewSec.classList.toggle("hide");
   textSec.style.gridColumn = previewSec.classList.contains("hide") ? "1/-1" : "auto";
   previewBtn.innerHTML = `<i class="fa-regular fa-${previewSec.classList.contains("hide") ? "eye" : "eye-slash"}"></i>`;
+
+  const secHeight = window.innerHeight - (header.clientHeight + textSec.firstElementChild.clientHeight);
+  preview.style.overflowY = preview.scrollHeight > secHeight ? "scroll" : "hidden";
+  preview.style.height = preview.scrollHeight > secHeight ? `${secHeight}px` : `${preview.scrollHeight}px`;
+  preview.scrollTop = text.scrollTop;
+
+  data.flat().find(item => item.id === +getCurId()).previewMode = previewSec.classList.contains("hide") ? false : true;
+  setLocalStorage("data", data);
 });
 
 menuBtn.addEventListener("click", () => menu.classList.toggle("show"));
@@ -341,7 +392,69 @@ window.addEventListener("load", function () {
 
   if (getLocalStorage("scrollable", false)) revealScroll();
 
-  autoresize(text);
+  checkHeight();
+
+  if (data.flat().find(item => item.id === +getCurId())) {
+    changePrev();
+  }
 });
 
+let trueTextHeight;
+
+const checkHeight = () => {
+  const secHeight = window.innerHeight - (header.clientHeight + textSec.firstElementChild.clientHeight);
+  trueTextHeight = text.scrollHeight;
+
+  text.style.overflowY = trueTextHeight > secHeight ? "scroll" : "hidden";
+  preview.style.overflowY = preview.scrollHeight > secHeight ? "scroll" : "hidden";
+  preview.style.height = preview.scrollHeight > secHeight ? `${secHeight}px` : `${preview.scrollHeight}px`;
+  text.style.height = 0;
+  text.style.height = trueTextHeight > secHeight ? `${secHeight}px` : `${text.scrollHeight}px`;
+
+  trueTextHeight = text.scrollHeight;
+};
+
+const saveCursor = () => {
+  data.flat().find(item => item.id === +getCurId()).position.cursor = [];
+  data.flat().find(item => item.id === +getCurId()).position.cursor.push(text.selectionStart, text.selectionEnd);
+  setLocalStorage("data", data);
+};
+
+text.addEventListener("keyup", () => {
+  checkHeight();
+  saveCursor();
+});
+
+text.addEventListener("keypress", () => {
+  checkHeight();
+  saveCursor();
+});
+
+text.addEventListener("click", saveCursor);
+
+text.addEventListener("scroll", () => {
+  const fullScroll = text.scrollTop + text.clientHeight;
+  if (fullScroll === text.scrollHeight) {
+    preview.scrollTop = text.scrollHeight;
+  } else {
+    preview.scrollTop = text.scrollTop;
+  }
+  data.flat().find(item => item.id === +getCurId()).position.scroll = text.scrollTop;
+  setLocalStorage("data", data);
+
+  if (filesParent.childElementCount === 1) changeLink("");
+});
+
+window.addEventListener("resize", () => {
+  const secHeight = window.innerHeight - (header.clientHeight + textSec.firstElementChild.clientHeight);
+
+  if (!preview) return;
+  preview.style.height = preview.scrollHeight > secHeight ? `${secHeight}px` : `${preview.scrollHeight}px`;
+
+  if (!text) return;
+  text.style.height = 0;
+  text.style.height = trueTextHeight > secHeight ? `${secHeight}px` : `${text.scrollHeight}px`;
+});
+
+// for dev
 // localStorage.clear();

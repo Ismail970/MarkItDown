@@ -5,6 +5,7 @@ $save-btn: #7F1900;
 $header: #2B2F31;
 $bars: #202324;
 $scroll-bar-bg: #868686;
+$main-bg: #181A1B;
 $gradiant: (
   "menu-btn": linear-gradient(to right, $header 90%, transparent),
   "header-btns": linear-gradient(to right, transparent, rgb(0, 0, 0)),
@@ -89,8 +90,12 @@ $gradiant: (
     }
   }
 
+  .preview {
+    background-color: $main-bg;
+  }
+
   .menu {
-    background-color: #181A1B;
+    background-color: $main-bg;
   }
 
 }

@@ -2,7 +2,11 @@
 @use "../abstracts/mixins" as *;
 
 body {
-  overflow-x: hidden;
+  overflow: hidden;
+}
+
+textarea {
+  cursor: auto;
 }
 
 .header {
@@ -10,6 +14,7 @@ body {
   justify-content: space-between;
   background-color: $header;
   overflow-x: auto;
+  overflow-y: hidden;
   padding-right: 5em;
 
   div {
@@ -138,15 +143,15 @@ body {
     height: 5px;
   }
 
-  &::-webkit-scrollbar-thumb {
-    background-color: $scroll-bar-bg;
-    border-radius: 10px;
-    border: 0px solid $header;
-  }
+  // &::-webkit-scrollbar-thumb {
+  //   background-color: $scroll-bar-bg;
+  //   border-radius: 10px;
+  //   border: 0px solid $header;
+  // }
 
-  &::-webkit-scrollbar-track {
-    background-color: $header;
-  }
+  // &::-webkit-scrollbar-track {
+  //   background-color: $header;
+  // }
 
   .files-container {
     height: 140%;
@@ -221,6 +226,15 @@ body {
   }
 }
 
+.preview {
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  width: 100%;
+  background-color: white;
+  min-height: 100vh;
+}
+
 .preview-btn {
   @include transition-ease(opacity);
 
@@ -230,6 +244,10 @@ body {
   }
 }
 
+main {
+  position: relative;
+}
+
 .menu {
   height: 100vh;
   position: absolute;
@@ -237,7 +255,7 @@ body {
   @include transition-ease(left);
   left: -100vw;
   min-width: 200px;
-  z-index: 1;
+  z-index: 2;
 
   >div {
     display: flex;
@@ -314,10 +332,29 @@ body {
 #preview {
   padding: 1em 2em;
   word-break: break-all;
+  overflow-x: hidden;
+}
 
-  img {
-    width: 100%;
+#text,
+#preview,
+.header {
+  &::-webkit-scrollbar-thumb {
+    background-color: $scroll-bar-bg;
+    border-radius: 10px;
+    border: 0px solid $header;
   }
+
+  &::-webkit-scrollbar-track {
+    background-color: $header;
+  }
+}
+
+#text,
+#preview {
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
 }
 
 .show {
